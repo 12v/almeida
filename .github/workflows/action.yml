@@ -16,7 +16,7 @@ jobs:
           
           echo $RESPONSE
           
-          MATCHES=$(echo $RESPONSE | jq '.[0].performances[] | select(.isOnSale == false or .performanceStatusMessage != "Sold out")')
+          MATCHES=$(echo $RESPONSE | jq '.[0].performances[] | select(.isOnSale != false or .performanceStatusMessage != "Sold out")')
           
           echo $MATCHES
           
