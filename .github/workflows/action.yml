@@ -1,0 +1,15 @@
+name: Almeida
+
+on:
+  push:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  check_tickets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get tickets
+        run: |
+          curl https://ticketing.almeida.co.uk/api/products/productionseasons --data 'productionSeasonIdFilter%5B%5D=5849&startDate=2023-01-15T00%3A00%3A00Z&endDate=2025-01-15T23%3A59%3A59Z'
