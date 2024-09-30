@@ -6,6 +6,9 @@ on:
     - cron: '*/5 * * * *'
   workflow_dispatch:
 
+concurrency:
+  group: almeida
+
 jobs:
   check_tickets:
     runs-on: ubuntu-latest
