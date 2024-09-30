@@ -12,18 +12,12 @@ jobs:
     steps:
       - name: Get tickets
         run: |
-          RESPONSE=$(curl https://ticketing.almeida.co.uk/api/products/productionseasons --data 'productionSeasonIdFilter%5B%5D=5849&startDate=2023-01-15T00%3A00%3A00Z&endDate=2025-01-15T23%3A59%3A59Z')
-          
-          echo $RESPONSE
-          
-          MATCHES=$(echo $RESPONSE | jq '.[0].performances[] | select(.isOnSale != false or (.performanceStatusMessage != "Sold out" and .performanceStatusMessage != "Tickets not on sale"))')
-          
-          echo $MATCHES
-          
-          if [ -z "$MATCHES" ]
-          then
-          echo "No matches found"
+          RESPONSE=$(curl -s 'https://almeida.co.uk/admin/wp-admin/admin-ajax.php' --data-raw 'action=calendar&filters=event%3D8236')
+
+          if echo "$RESPONSE" | grep -q 'Book Tickets'; then
+            echo "The response contains 'Book Tickets'."
+            echo "$RESPONSE" | grep 'Book Tickets'
+            exit 111
           else
-          echo "Matches found"
-          exit 111
+            echo "The response does not contain 'Book Tickets'."
           fi
