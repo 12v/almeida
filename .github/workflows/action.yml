@@ -16,29 +16,20 @@ jobs:
       - name: Get tickets
         run: |
           for run in {1..120}; do
-            RESPONSE=$(curl -s -w "%{http_code}" -o response_body.txt 'https://almeida.co.uk/admin/wp-admin/admin-ajax.php' --data-raw 'action=calendar&filters=event%3D8236')
-  
-            HTTP_STATUS=$(tail -n1 <<< "$RESPONSE")
+            RESPONSE=$(curl https://ticketing.almeida.co.uk/api/products/productionseasons --data 'productionSeasonIdFilter%5B%5D=7450&startDate=2024-01-15T00%3A00%3A00Z&endDate=2025-03-15T23%3A59%3A59Z')
+          
+            echo $RESPONSE
             
-            if [ "$HTTP_STATUS" -ne 200 ]; then
-              echo "HTTP request failed with status code $HTTP_STATUS"
-              break
-            fi
+            MATCHES=$(echo $RESPONSE | jq '.[0].performances[] | select(.isOnSale != false or (.performanceStatusMessage != "Sold out" and .performanceStatusMessage != "Tickets not on sale"))')
             
-            RESPONSE_BODY=$(cat response_body.txt)
+            echo $MATCHES
             
-            if echo "$RESPONSE_BODY" | grep -q 'instances'; then
-              echo "The response contains 'instances'."
-              if echo "$RESPONSE_BODY" | grep -q 'Book Tickets'; then
-                echo "The response contains 'Book Tickets'."
-                echo "$RESPONSE_BODY" | grep 'Book Tickets'
-                exit 111
-              else
-                echo "The response does not contain 'Book Tickets'."
-              fi
+            if [ -z "$MATCHES" ]
+            then
+            echo "No matches found"
             else
-              echo "The response does not contain 'instances'."
-              break
+            echo "Matches found"
+            exit 111
             fi
   
             sleep 10
