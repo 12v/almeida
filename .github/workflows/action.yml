@@ -16,14 +16,31 @@ jobs:
       - name: Get tickets
         run: |
           for run in {1..120}; do
-            RESPONSE=$(curl -s 'https://almeida.co.uk/admin/wp-admin/admin-ajax.php' --data-raw 'action=calendar&filters=event%3D8236')
-            if echo "$RESPONSE" | grep -q 'Book Tickets'; then
-              echo "The response contains 'Book Tickets'."
-              echo "$RESPONSE" | grep 'Book Tickets'
-              exit 111
-            else
-              echo "The response does not contain 'Book Tickets'."
+            RESPONSE=$(curl -s -w "%{http_code}" -o response_body.txt 'https://almeida.co.uk/admin/wp-admin/admin-ajax.php' --data-raw 'action=calendar&filters=event%3D8236')
+  
+            HTTP_STATUS=$(tail -n1 <<< "$RESPONSE")
+            
+            if [ "$HTTP_STATUS" -ne 200 ]; then
+              echo "HTTP request failed with status code $HTTP_STATUS"
+              break
             fi
+            
+            RESPONSE_BODY=$(cat response_body.txt)
+            
+            if echo "$RESPONSE_BODY" | grep -q 'instances'; then
+              echo "The response contains 'instances'."
+              if echo "$RESPONSE_BODY" | grep -q 'Book Tickets'; then
+                echo "The response contains 'Book Tickets'."
+                echo "$RESPONSE_BODY" | grep 'Book Tickets'
+                exit 111
+              else
+                echo "The response does not contain 'Book Tickets'."
+              fi
+            else
+              echo "The response does not contain 'instances'."
+              break
+            fi
+  
             sleep 10
           done
           
