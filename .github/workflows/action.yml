@@ -16,7 +16,7 @@ jobs:
       - name: Get tickets
         run: |
           for run in {1..120}; do
-            RESPONSE=$(curl https://ticketing.almeida.co.uk/api/products/productionseasons --data 'productionSeasonIdFilter%5B%5D=7450&startDate=2024-01-15T00%3A00%3A00Z&endDate=2025-03-15T23%3A59%3A59Z')
+            RESPONSE=$(curl https://ticketing.almeida.co.uk/api/products/productionseasons --data 'productionSeasonIdFilter%5B%5D=7198&startDate=2024-11-19T00%3A00%3A00Z&endDate=2024-11-19T23%3A59%3A59Z')
           
             echo $RESPONSE
             
